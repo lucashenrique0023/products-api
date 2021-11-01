@@ -1,5 +1,5 @@
 
-export class Product {
+export class Book {
 
     id: number;
     code: string;
