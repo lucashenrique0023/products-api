@@ -1,33 +1,38 @@
 import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/sequelize";
 import { Book } from "./book.model";
 
 @Injectable()
 export class BookService {
 
-    books: Book[] = [
-        // new Book("BOOK01", "Book 01", 29.90),
-        // new Book("BOOK02", "Book 02", 32.90),
-        // new Book("BOOK03", "Book 03", 33.33)
-    ]
+    constructor(
+        @InjectModel(Book)
+        private bookModel: typeof Book
+    ) {}
 
-    getAll(): Book[] {
-        return this.books;
+    async findAll(): Promise<Book[]> {
+        return this.bookModel.findAll();
     }
 
-    getById(id: number): Book {
-        return this.books[0];
+    async findById(id: number): Promise<Book> {
+        return this.bookModel.findByPk(id);
     }
 
-    add(book: Book) {
-        this.books.push(book);
+    async create(book: Book) {
+        this.bookModel.create(book);
     }
 
-    edit(book: Book): Book {
-        return book;
+    async update(book: Book): Promise<[number, Book[]]> {
+        return this.bookModel.update(book, {
+            where: {
+                id: book.id
+            }
+        });
     }
 
-    delete(id: number) {
-        this.books.pop();
+    async delete(id: number) {
+        const book: Book = await this.findById(id);
+        book.destroy();
     }
 
 }
